@@ -1,0 +1,275 @@
+.TH BOARDPREP 1
+.SH NAME
+boardprep \- manage Eagle board of review documents
+.SH SYNOPSIS
+.B boardprep
+.RB [ \-aBChIimnRx ]
+.RB [ \-b
+.IR file ]
+.RB [ \-c 
+.IR file ]
+.RB [ \-\-chair
+.IR name ]
+.RB [ \-e
+.IR file ]
+.RB [ \-M
+.IR text ]
+.RB [ \-q
+.IR date ]
+.RB [ \-s
+.IR subject ]
+.I candidate_file
+.LP
+.B boardprep
+.B \-\-help
+.LP
+.B boardprep
+.RB [ \-\-all ]
+.RB [ \-\-board\-chair\-mail ]
+.RB [ \-\-boardsheets
+.IR file ]
+.RB [ \-\-check ]
+.RB [ \-\-contacts
+.IR file ]
+.RB [ \-\-chair ]
+.RB [ \-\-envelopes
+.IR file ]
+.RB [ \-\-invite ]
+.RB [ \-\-interactive ]
+.RB [ \-\-message
+.IR text ]
+.RB [ \-\-mail ]
+.RB [ \-\-dry\-run ]
+.RB [ \-\-query\-mail 
+.IR date ]
+.RB [ \-\-received ]
+.RB [ \-\-subject
+.IR text ]
+.RB [ \-\-no\-message ]
+.I candidate_file
+.SH DESCRIPTION
+.LP
+The
+.B boardprep
+program produces various documents and sends email reminders relating to
+Eagle boards of review.  All operations read an input file,
+.IR candidate_file ,
+which is in CSV format.  Currently, we produce this from the Google Sheets
+document by choosing \*(lqFile > Download > CSV\*(rq to download a copy
+of the \*(lqBoards of Review\*(rq tab of the spreadsheet.
+.LP
+See the \*(lqOPTIONS\*(rq seciton below for a description of the various
+modes of operation which are carried out in response to command-line options
+presented.
+.LP
+Email is sent to the SMTP service on TCP port 1025 on the local host.
+.SH OPTIONS
+.TP 19
+.B \-\-all
+.RB ( \-a )
+Include rows with statuses of
+.BR pending ,
+.BR wcb ,
+and
+.BR msg .
+.TP
+.B \-\-board\-chair\-mail
+.RB ( \-B )
+Send email instructions to participants as the board chair.
+.TP
+.BI \-\-boardsheets= file
+.RB ( \-b
+.IR file )
+Produce board session cover sheets which go on the packets handed to board chairs.
+This will be a PostScript format output written to
+.IR file .
+The entries pulled for this are the ones which have 
+.RB \*(lq Scheduled \*(eq
+in their status column.  Be sure the board chair and 2nd member are filled in
+for these.
+.TP
+.B \-\-check
+.RB ( \-C )
+Check that the candidates file appears to be in order.
+.TP
+.BI \-\-contacts= file
+.RB ( \-c
+.IR file )
+Names the CSV-formatted file holding board member contact information.
+Used for the 
+.B \-\-mail
+option. Defaults to reading a file called 
+.I contacts.csv
+in the current directory. This file must be a CSV-format download of the
+\*(lqcontacts\*(rq tab of the spreadsheet.
+.TP
+.BI \-\-chair= name
+When sending instructions to participants via the
+.B \-\-board\-chair\-mail
+option, normally the mail template assumes you are the board chair. If this is
+not the case, use the
+.B \-\-chair
+option to specify the board chair's name.
+.TP
+.B \-\-dry\-run
+.RB ( \-n )
+Used with the 
+.B \-\-mail
+option, this causes a test run of the mail to go out.  It will be mailed 
+only to the configured coordinator rather than the actual recipients.
+.TP
+.BI \-\-envelopes= file
+.RB ( \-e
+.IR file )
+Produce envelope cover sheets to attach to the packet envelopes before submitting
+the paperwork to Council.  This will be a PostScript format output in 
+.IR file .
+The entries pulled for this are the ones which have 
+.RB \*(lq Council \*(rq
+in their status column.  All the relevant columns should be present, including birthday,
+notes, contact information, unit, and the dates the forms were received and the date forwarded
+to Council.
+.RS
+.LP
+The venue code taken from the spreadsheet is used to include address information
+to the attendees. If more venue codes are added to the spreadsheet, they need to
+be added to the
+.B BoardsOfReview.py
+module source file as well.
+.RE
+.TP 
+.B \-\-help
+.RB ( \-h )
+Print a short summary of command options and exit.
+.TP
+.B \-\-interactive
+.RB ( \-i )
+Prompt the user to decide whether to send out each e-mail reminder.  Use
+this if making changes to only some schedules, to avoid spamming all the other
+people when sending out corrections.
+.TP
+.B \-\-invite
+.RB ( \-I )
+Send mail to scouts and unit leaders to indicate that their paperwork has been approved
+by Council. This invites them to schedule a board of review.
+.TP 
+.B \-\-mail
+.RB ( \-m )
+Send email reminders to the candidates and board members.  This takes all the
+entries listed as 
+.RB \*(lq Scheduled \*(rq
+status and sends email based on the contact information on the sheet, as well
+as the other fields.  It will, for example, remind candidates to bring outstanding
+letters of recommendation.  Be sure the board members names are spelled 
+.I exactly
+as they are in the contacts file (see the
+.BR \-\-contacts
+option).  It's a good idea to make a test pass with the
+.B \-\-dry\-run
+option to be sure everything is right before sending the real mail.
+See also
+.B \-\-message
+and 
+.B \-\-interactive
+options.
+.TP
+.BI \-\-message= text
+.RB ( \-M
+.IR text )
+Add the specified
+.I text
+to mail messages sent via the 
+.B \-\-mail
+option.  This can be used, for example, when making a note to everyone
+about a change in plans or special announcement.
+.TP
+.BI \-\-query\-mail= date
+.RB ( \-q
+.IR date )
+Send out mail to everyone in the contacts CSV file, asking them if they would
+be willing to staff a board of review on the indicated
+.IR date .
+.B (Obsolete)
+We don't really use this feature anymore.
+.TP
+.B \-\-received
+.RB ( \-R )
+Sends mail to scouts listed with the status
+.BR Council ,
+thanking them for submitting their paperwork and letting them know we're sending it on to Council for approval.
+.TP
+.BI \-\-subject= text
+.RB ( \-s
+.IR text )
+Set a custom value for the email subject line.
+.TP
+.B \-\-no\-message
+.RB ( \-x )
+Don't send the normal message in the email; just whatever was specified with the
+.B \-\-message
+option value.
+.SH EXAMPLES
+.LP
+We will use
+.B boards.csv
+for the spreadsheet download file and assume the contact information is in the default
+.B contacts.csv
+file.
+.LP
+Received application, sent on to council (status is
+.BR Council ).
+.br
+.B $
+.B boardprep
+.B \-\-received
+.B \-\-interactive
+.B boards.csv
+.LP
+Paperwork back from council, ready to schedule boards.
+(Status set to
+.BR Pending .)
+.br
+.B $
+.B boardprep
+.B \-\-invite
+.B \-\-interactive
+.B boards.csv
+.LP
+Remind everyone of their parts to play in upcoming boards of review. (Status set to
+.BR Scheduled .)
+.br
+.B $
+.B boardprep
+.B \-\-mail
+.B \-\-interactive
+.B boards.csv
+.LP
+Print out the paperwork for the board of review itself. (Status set to
+.BR Scheduled .)
+.br
+.B $
+.B boardprep
+.B \-\-boardsheets
+.IB file .ps
+.B boards.csv
+.br
+.B $
+.B ps2pdf
+.IB file .ps
+.IB file .pdf
+.br
+(Print the 
+.IB file .pdf
+file.)
+.SH FILES
+.TP
+.B contacts.csv
+Listing of board chair and district members, their email addresses, and phone numbers.
+.TP
+.BI zoom- dd - Mmm - yyyy , hh : mm PM
+When using the
+.B \-\-board\-chair\-email
+option to send participation instructions as (or on behalf of) the board chair,
+a file with this name (e.g., 
+.BR zoom-02-Aug-2022,7:00PM )
+is expected which contains Zoom call meeting information.

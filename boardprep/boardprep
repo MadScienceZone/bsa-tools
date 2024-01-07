@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+#
+from BoardsOfReview import BoardsOfReview
+import sys
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("candidate_file", help="input file with candidate schedule (CSV format)")
+parser.add_argument("-a", "--all", action="store_true", help="Include all pending/wcb/msg scouts")
+parser.add_argument("-B", "--board-chair-mail", action="store_true", help="send email instructions as board chair")
+parser.add_argument("-b", "--boardsheets", metavar="FILE", help="Output board cover sheets to FILE")
+parser.add_argument("-C", "--check", action="store_true", help="Check column alignment of file")
+parser.add_argument("-c", "--contacts", metavar="FILE", default="contacts.csv", help="staff contact list [contacts.csv]")
+parser.add_argument("--chair", metavar="name", help="Name the board chair if not you.")
+parser.add_argument("-e", "--envelopes", metavar="FILE", help="Output envelopes to FILE")
+parser.add_argument("-I", "--invite", action="store_true", help="invite leaders to schedule boards")
+parser.add_argument("-i", "--interactive", action="store_true",  help="prompt before each email")
+parser.add_argument("-M", "--message", metavar="TEXT", help="add extra message to email")
+parser.add_argument("-m", "--mail", action="store_true", help="send email reminders")
+parser.add_argument("-n", "--dry-run", action="store_true",  help="send mail to steve ONLY not the scouts/leaders")
+parser.add_argument("-q", "--query-mail", metavar="DATE", help="send email queries to contacts")
+parser.add_argument("-R", "--received", action="store_true", help="Thank sender for their paperwork")
+parser.add_argument("-s", "--subject", metavar="TEXT", help="Set custom subject line")
+parser.add_argument("-x", "--no-message", action="store_true", help="Suppress the normal message entirely; only send the -M text to recipients")
+args = parser.parse_args()
+
+bor = BoardsOfReview(args.candidate_file)
+bor.load_contacts(args.contacts)
+
+if args.check:
+    bor.check()
+    sys.exit(0)
+
+bor.read_input()
+if args.envelopes:
+    bor.write_envelopes(args.envelopes)
+if args.boardsheets:
+    bor.write_cover_sheets(args.boardsheets)
+if args.no_message and not args.message:
+    parser.error('Specifying -x requires -M also or there won\'t be any message in the email sent out.')
+if args.mail:
+    if args.subject:
+        parser.error("Custom subject line not implemented yet for this mode.")
+    bor.reminder_mail(dry_run=args.dry_run, interactive=args.interactive, extra_msg=args.message, no_message=args.no_message)
+if args.board_chair_mail:
+    if args.subject:
+        parser.error("Custom subject line not implemented yet for this mode.")
+    bor.board_chair_mail(dry_run=args.dry_run, interactive=args.interactive, extra_msg=args.message, no_message=args.no_message, chair_name=args.chair)
+if args.query_mail:
+    bor.query_mail(dry_run=args.dry_run, interactive=args.interactive, extra_msg=args.message, board_date=args.query_mail, no_message=args.no_message, subject=args.subject)
+if args.invite:
+    if args.subject:
+        parser.error("Custom subject line not implemented yet for this mode.")
+    bor.invitation_mail(dry_run=args.dry_run, interactive=args.interactive, extra_msg=args.message, all_scouts=args.all, no_message=args.no_message)
+if args.received:
+    bor.received_mail(dry_run=args.dry_run, interactive=args.interactive, extra_msg=args.message, all_scouts=args.all, no_message=args.no_message)

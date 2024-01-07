@@ -1,0 +1,15 @@
+***DELETE THIS LINE*** This contacts file used to be a more general-purpose directory of volunteers
+***DELETE THIS LINE*** and hence the extra fields. For the boardprep script, the significant ones
+***DELETE THIS LINE*** are just fields 5, 6, 7, 8, and 13. These are separated by commas as you can
+***DELETE THIS LINE*** see in the example lines below. Any data which contains a comma needs to be
+***DELETE THIS LINE*** enclosed in quoatation marks.
+***DELETE THIS LINE*** Field 5: MEMBER or CHAIR
+***DELETE THIS LINE*** Field 6: First name
+***DELETE THIS LINE*** Field 7: Last name
+***DELETE THIS LINE*** Field 8: Phone number
+***DELETE THIS LINE*** Field 13: Email address
+
+
+
+1,,,,MEMBER,Alice,Scouter,,,,,,ascouter@example.com
+2,,,,CHAIR,Bob,Scouter,503-555-0123,,,,,bscouter@example.com
